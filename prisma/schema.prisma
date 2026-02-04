@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Brand {
+  id            String         @id @default(cuid())
+  name          String
+  slug          String         @unique
+  description   String?
+  logoUrl       String?
+  category      String?
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  clicks        Click[]
+  referralLinks ReferralLink[]
+}
+
+model ReferralLink {
+  id          String   @id @default(cuid())
+  brandId     String
+  url         String
+  userName    String
+  isFounder   Boolean  @default(false)
+  weight      Int      @default(10)
+  clicks      Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  clickEvents Click[]
+  brand       Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId])
+}
+
+model Click {
+  id             String       @id @default(cuid())
+  brandId        String
+  referralLinkId String
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime     @default(now())
+  referralLink   ReferralLink @relation(fields: [referralLinkId], references: [id], onDelete: Cascade)
+  brand          Brand        @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId])
+  @@index([referralLinkId])
+  @@index([createdAt])
+}
