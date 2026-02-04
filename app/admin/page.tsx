@@ -1,227 +1,151 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import AdminStats from '@/components/admin/AdminStats';
+import BrandManagementTable from '@/components/admin/BrandManagementTable';
 
-type ReferralLink = {
-  id: string;
-  userName: string;
-  isFounder: boolean;
-  weight: number;
-  clicks: number;
-  url: string;
-};
+export default async function AdminPage() {
+  // Get overall stats
+  const [totalBrands, totalLinks, totalClicks, founderLinks] = await Promise.all([
+    prisma.brand.count(),
+    prisma.referralLink.count(),
+    prisma.click.count(),
+    prisma.referralLink.count({ where: { isFounder: true } }),
+  ]);
 
-type Brand = {
-  id: string;
-  name: string;
-  slug: string;
-  category: string | null;
-  referralLinks: ReferralLink[];
-  _count: {
-    clicks: number;
-  };
-};
+  // Get recent clicks
+  const recentClicks = await prisma.click.findMany({
+    take: 10,
+    orderBy: { createdAt: 'desc' },
+    include: {
+      brand: { select: { name: true, slug: true } },
+      referralLink: { select: { userName: true, isFounder: true } },
+    },
+  });
 
-export default function AdminDashboard() {
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchBrands();
-  }, []);
-
-  const fetchBrands = async () => {
-    try {
-      const response = await fetch('/api/admin/brands');
-      const data = await response.json();
-      setBrands(data);
-    } catch (error) {
-      console.error('Error fetching brands:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateWeights = async (brandId: string, linkId: string, newWeight: number) => {
-    setSaving(linkId);
-    try {
-      await fetch('/api/admin/weights', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ linkId, weight: newWeight }),
-      });
-
-      setBrands((prevBrands) =>
-        prevBrands.map((brand) =>
-          brand.id === brandId
-            ? {
-                ...brand,
-                referralLinks: brand.referralLinks.map((link) =>
-                  link.id === linkId ? { ...link, weight: newWeight } : link
-                ),
-              }
-            : brand
-        )
-      );
-    } catch (error) {
-      console.error('Error updating weight:', error);
-    } finally {
-      setSaving(null);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
-        <div className="text-xl text-gray-600">Loading...</div>
-      </div>
-    );
-  }
+  // Get brands with founder link status
+  const brands = await prisma.brand.findMany({
+    orderBy: { name: 'asc' },
+    include: {
+      referralLinks: {
+        where: { isFounder: true },
+        take: 1,
+      },
+      _count: {
+        select: { referralLinks: true, clicks: true },
+      },
+    },
+  });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 py-12 max-w-7xl">
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-            <p className="text-gray-600">Manage referral link weight distribution (70/20/10)</p>
+            <h1 className="text-4xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p className="text-gray-600 mt-2">Manage your brands and founder codes</p>
           </div>
           <Link
             href="/"
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
           >
-            ← Back to Home
+            ← Back to Site
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-6">
-          {brands.map((brand) => {
-            const totalWeight = brand.referralLinks.reduce((sum, link) => sum + link.weight, 0);
-            return (
-              <div key={brand.id} className="bg-white rounded-xl shadow-lg p-6">
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-1">{brand.name}</h2>
-                    <div className="flex items-center gap-3">
-                      {brand.category && (
-                        <span className="text-sm text-gray-500">{brand.category}</span>
-                      )}
-                      <span className="text-sm text-gray-500">
-                        {brand._count.clicks.toLocaleString()} total clicks
-                      </span>
-                    </div>
-                  </div>
-                  <Link
-                    href={`/referral/${brand.slug}`}
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                  >
-                    View Page →
-                  </Link>
-                </div>
+        {/* Stats Overview */}
+        <AdminStats
+          totalBrands={totalBrands}
+          totalLinks={totalLinks}
+          totalClicks={totalClicks}
+          founderLinks={founderLinks}
+        />
 
-                <div className="space-y-4">
-                  {brand.referralLinks.map((link) => {
-                    const percentage = totalWeight > 0 ? (link.weight / totalWeight) * 100 : 0;
-                    return (
-                      <div
-                        key={link.id}
-                        className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition"
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-gray-900">{link.userName}</span>
-                            {link.isFounder && (
-                              <span className="text-xs bg-gradient-to-r from-amber-500 to-orange-500 text-white px-2 py-1 rounded-full font-semibold">
-                                Verified Top Contributor
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-right">
-                            <span className="text-lg font-bold text-blue-600">
-                              {percentage.toFixed(0)}%
-                            </span>
-                            <span className="text-sm text-gray-500 ml-2">
-                              ({link.clicks.toLocaleString()} clicks)
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                          <label className="text-sm font-medium text-gray-700 min-w-[60px]">
-                            Weight:
-                          </label>
-                          <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={link.weight}
-                            onChange={(e) =>
-                              updateWeights(brand.id, link.id, parseInt(e.target.value))
-                            }
-                            className="flex-grow h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                            disabled={saving === link.id}
-                          />
-                          <input
-                            type="number"
-                            min="0"
-                            max="100"
-                            value={link.weight}
-                            onChange={(e) =>
-                              updateWeights(brand.id, link.id, parseInt(e.target.value) || 0)
-                            }
-                            className="w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm"
-                            disabled={saving === link.id}
-                          />
-                          {saving === link.id && (
-                            <span className="text-xs text-blue-600">Saving...</span>
-                          )}
-                        </div>
-
-                        <div className="mt-3 w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all ${
-                              link.isFounder
-                                ? 'bg-gradient-to-r from-amber-500 to-orange-500'
-                                : link.weight >= 20
-                                ? 'bg-blue-500'
-                                : 'bg-gray-400'
-                            }`}
-                            style={{ width: `${percentage}%` }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                  <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                    Recommended Distribution (70/20/10):
-                  </h3>
-                  <div className="flex gap-4 text-xs text-gray-700">
-                    <div>
-                      <span className="font-medium">Founder:</span> 70
-                    </div>
-                    <div>
-                      <span className="font-medium">Top Contributor:</span> 20
-                    </div>
-                    <div>
-                      <span className="font-medium">Community:</span> 10
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+        {/* Quick Actions */}
+        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link
+              href="/admin/brands/add"
+              className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition text-center"
+            >
+              <div className="text-3xl mb-2">➕</div>
+              <div className="font-semibold text-gray-700">Add New Brand</div>
+            </Link>
+            <Link
+              href="/admin/codes/add"
+              className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition text-center"
+            >
+              <div className="text-3xl mb-2">🔗</div>
+              <div className="font-semibold text-gray-700">Add Founder Code</div>
+            </Link>
+            <Link
+              href="/admin/analytics"
+              className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition text-center"
+            >
+              <div className="text-3xl mb-2">📊</div>
+              <div className="font-semibold text-gray-700">View Analytics</div>
+            </Link>
+          </div>
         </div>
 
-        {brands.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-gray-500 text-lg">No brands available.</p>
-          </div>
-        )}
+        {/* Brand Management */}
+        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Brand Management</h2>
+          <BrandManagementTable brands={brands} />
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Clicks</h2>
+          {recentClicks.length === 0 ? (
+            <p className="text-gray-500 text-center py-8">No clicks yet</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Brand</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">User</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Time</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {recentClicks.map((click) => (
+                    <tr key={click.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3">
+                        <Link
+                          href={`/referral/${click.brand.slug}`}
+                          className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                          {click.brand.name}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3 text-gray-700">
+                        {click.referralLink.userName}
+                      </td>
+                      <td className="px-4 py-3">
+                        {click.referralLink.isFounder ? (
+                          <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-medium">
+                            Founder
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
+                            Community
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-gray-500 text-sm">
+                        {new Date(click.createdAt).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

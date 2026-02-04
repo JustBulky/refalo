@@ -1,19 +1,49 @@
-import Link from 'next/link';
+import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
+import { getDisplayLinks } from '@/lib/link-router';
+import ReferralLinkCard from '@/components/ReferralLinkCard';
+import GetReferralButton from '@/components/GetReferralButton';
 
-export default async function BrandDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
+interface BrandPageProps {
+  params: {
+    slug: string;
+  };
+}
 
+export async function generateMetadata({ params }: BrandPageProps): Promise<Metadata> {
   const brand = await prisma.brand.findUnique({
-    where: { slug, isActive: true },
+    where: { slug: params.slug },
+  });
+
+  if (!brand) {
+    return {
+      title: 'Brand Not Found',
+    };
+  }
+
+  return {
+    title: `${brand.name} Referral Codes & Links | Refalo`,
+    description: `Get the best ${brand.name} referral codes and sign-up bonuses. ${brand.description || 'Join thousands earning rewards.'}`,
+    openGraph: {
+      title: `${brand.name} Referral Codes`,
+      description: brand.description || `Get exclusive ${brand.name} referral bonuses`,
+      images: brand.logoUrl ? [brand.logoUrl] : [],
+    },
+  };
+}
+
+export default async function BrandPage({ params }: BrandPageProps) {
+  const brand = await prisma.brand.findUnique({
+    where: { slug: params.slug },
     include: {
       referralLinks: {
-        orderBy: { weight: 'desc' },
+        where: { clicks: { gte: 0 } }, // All active links
+        orderBy: [
+          { weight: 'desc' },
+          { clicks: 'desc' },
+        ],
       },
       _count: {
         select: { clicks: true },
@@ -21,130 +51,149 @@ export default async function BrandDetailPage({
     },
   });
 
-  if (!brand) {
+  if (!brand || !brand.isActive) {
     notFound();
   }
 
-  const referralUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/r/${brand.slug}`;
+  // Get display links (shows top links in UI)
+  const displayLinks = getDisplayLinks(brand.referralLinks, 10);
+  const totalLinks = brand.referralLinks.length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
+        {/* Back Navigation */}
         <Link
           href="/"
-          className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-8"
+          className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6"
         >
-          ← Back to all brands
+          ← Back to All Brands
         </Link>
 
+        {/* Brand Header */}
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                {brand.name}
-              </h1>
-              {brand.category && (
-                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                  {brand.category}
-                </span>
+          <div className="flex items-start gap-6">
+            {brand.logoUrl && (
+              <img
+                src={brand.logoUrl}
+                alt={`${brand.name} logo`}
+                className="w-24 h-24 rounded-xl object-contain"
+              />
+            )}
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-4xl font-bold text-gray-900">{brand.name}</h1>
+                {brand.category && (
+                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                    {brand.category}
+                  </span>
+                )}
+              </div>
+              {brand.description && (
+                <p className="text-lg text-gray-600 mb-4">{brand.description}</p>
               )}
+              <div className="flex gap-6 text-sm text-gray-500">
+                <div>
+                  <span className="font-semibold text-gray-700">{totalLinks}</span> referral codes available
+                </div>
+                <div>
+                  <span className="font-semibold text-gray-700">{brand._count.clicks}</span> total uses
+                </div>
+              </div>
             </div>
           </div>
 
-          {brand.description && (
-            <p className="text-lg text-gray-600 mb-6">{brand.description}</p>
+          {/* Primary CTA */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <GetReferralButton brandSlug={brand.slug} />
+          </div>
+        </div>
+
+        {/* How It Works */}
+        <div className="bg-blue-50 rounded-xl p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">How It Works</h2>
+          <ol className="space-y-2 text-gray-700">
+            <li className="flex items-start">
+              <span className="font-bold text-blue-600 mr-2">1.</span>
+              Click "Get Referral Link" above to get a verified referral code
+            </li>
+            <li className="flex items-start">
+              <span className="font-bold text-blue-600 mr-2">2.</span>
+              Sign up for {brand.name} using the referral link
+            </li>
+            <li className="flex items-start">
+              <span className="font-bold text-blue-600 mr-2">3.</span>
+              Get your sign-up bonus or discount automatically
+            </li>
+          </ol>
+        </div>
+
+        {/* Community Codes Section */}
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Community Referral Codes
+            </h2>
+            <Link
+              href={`/submit?brand=${brand.slug}`}
+              className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+            >
+              Add Your Code →
+            </Link>
+          </div>
+
+          {displayLinks.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              <p className="mb-4">No referral codes yet. Be the first to add one!</p>
+              <Link
+                href={`/submit?brand=${brand.slug}`}
+                className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                Add Your Referral Code
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {displayLinks.map((link) => (
+                <ReferralLinkCard
+                  key={link.id}
+                  link={link}
+                  brandSlug={brand.slug}
+                />
+              ))}
+            </div>
           )}
 
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl p-6 mb-6">
-            <h2 className="text-2xl font-bold mb-2">Smart Referral Link</h2>
-            <p className="mb-4 opacity-90">
-              This link automatically distributes traffic using our 70/20/10 algorithm
-            </p>
-            <div className="bg-white/10 backdrop-blur rounded-lg p-4 mb-4">
-              <code className="text-sm break-all">{referralUrl}</code>
+          {totalLinks > 10 && (
+            <div className="mt-6 text-center text-sm text-gray-500">
+              Showing top {Math.min(10, totalLinks)} of {totalLinks} codes
             </div>
-            <a
-              href={`/api/r/${brand.slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-white text-blue-600 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100 transition"
-            >
-              Use Referral Link →
-            </a>
-          </div>
+          )}
+        </div>
 
-          <div className="border-t border-gray-200 pt-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-900">Link Distribution</h3>
-              <span className="text-sm text-gray-500">
-                {brand._count.clicks.toLocaleString()} total clicks
-              </span>
-            </div>
-
-            <div className="space-y-4">
-              {brand.referralLinks.map((link) => {
-                const percentage = (link.weight / brand.referralLinks.reduce((sum, l) => sum + l.weight, 0)) * 100;
-                return (
-                  <div key={link.id} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-gray-900">
-                          {link.userName}
-                        </span>
-                        {link.isFounder && (
-                          <span className="text-xs bg-gradient-to-r from-amber-500 to-orange-500 text-white px-2 py-1 rounded-full font-semibold">
-                            Verified Top Contributor
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <span className="text-lg font-bold text-blue-600">
-                          {percentage.toFixed(0)}%
-                        </span>
-                        <span className="text-sm text-gray-500 ml-2">
-                          ({link.clicks.toLocaleString()} clicks)
-                        </span>
-                      </div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all ${
-                          link.isFounder
-                            ? 'bg-gradient-to-r from-amber-500 to-orange-500'
-                            : link.weight === 20
-                            ? 'bg-blue-500'
-                            : 'bg-gray-400'
-                        }`}
-                        style={{ width: `${percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="mt-8 p-6 bg-blue-50 rounded-xl">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">
-              How It Works
-            </h3>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li className="flex items-start">
-                <span className="text-blue-600 mr-2">•</span>
-                <span>70% of clicks go to verified top contributors (founders)</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-blue-600 mr-2">•</span>
-                <span>20% go to active community contributors</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-blue-600 mr-2">•</span>
-                <span>10% distributed to newer community members</span>
-              </li>
-            </ul>
-          </div>
+        {/* SEO Content */}
+        <div className="mt-8 prose prose-blue max-w-none">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            About {brand.name} Referral Program
+          </h2>
+          <p className="text-gray-700">
+            {brand.name} offers referral bonuses for new users. By using a referral code from our community,
+            you can get exclusive sign-up bonuses that aren't available to regular users. Our community has
+            shared {totalLinks} verified referral codes to help you maximize your rewards.
+          </p>
         </div>
       </div>
     </div>
   );
+}
+
+export async function generateStaticParams() {
+  const brands = await prisma.brand.findMany({
+    where: { isActive: true },
+    select: { slug: true },
+  });
+
+  return brands.map((brand) => ({
+    slug: brand.slug,
+  }));
 }
