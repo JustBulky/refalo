@@ -92,9 +92,9 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
-  const { slug } = params;
+  const { slug } = await params;
 
   try {
     const brand = await prisma.brand.findUnique({
