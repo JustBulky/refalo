@@ -18,8 +18,8 @@ export default async function AddCodePage({
   });
 
   const selectedBrand = searchParams.brand
-    ? brands.find((b) => b.slug === searchParams.brand)
-    : null;
+  ? brands.find((b: { slug: string; id: string; name: string }) => b.slug === searchParams.brand)
+  : null;
 
   return (
     <div className="min-h-screen bg-gray-50">
