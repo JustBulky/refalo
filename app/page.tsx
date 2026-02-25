@@ -17,7 +17,11 @@ export default async function Home() {
     },
   });
 
-  const categories = Array.from(new Set(brands.map((b) => b.category).filter(Boolean))) as string[];
+  const categories = Array.from(
+    new Set(
+      brands.map((b: { category: string | null }) => b.category).filter(Boolean)
+    )
+  ) as string[];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
