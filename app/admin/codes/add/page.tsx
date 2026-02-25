@@ -18,7 +18,7 @@ export default async function AddCodePage({
   });
 
   const selectedBrand = searchParams.brand
-  ? brands.find((b: { slug: string; id: string; name: string }) => b.slug === searchParams.brand)
+  ? brands.find((b: { slug: string; id: string; name: string }) => b.slug === searchParams.brand) || null
   : null;
 
   return (
