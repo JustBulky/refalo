@@ -7,14 +7,15 @@ import ReferralLinkCard from '@/components/ReferralLinkCard';
 import GetReferralButton from '@/components/GetReferralButton';
 
 interface BrandPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({ params }: BrandPageProps): Promise<Metadata> {
+  const { slug } = await params;
   const brand = await prisma.brand.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
   });
 
   if (!brand) {
@@ -35,8 +36,9 @@ export async function generateMetadata({ params }: BrandPageProps): Promise<Meta
 }
 
 export default async function BrandPage({ params }: BrandPageProps) {
+  const { slug } = await params;
   const brand = await prisma.brand.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     include: {
       referralLinks: {
         where: { clicks: { gte: 0 } }, // All active links
