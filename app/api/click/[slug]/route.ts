@@ -123,8 +123,8 @@ export async function POST(
         url: selectedLink.url,
       } : null,
       totalLinks: brand.referralLinks.length,
-      founderLinks: brand.referralLinks.filter(l => l.isFounder).length,
-      communityLinks: brand.referralLinks.filter(l => !l.isFounder).length,
+      founderLinks: brand.referralLinks.filter((l: { isFounder: boolean }) => l.isFounder).length,
+      communityLinks: brand.referralLinks.filter((l: { isFounder: boolean }) => !l.isFounder).length,
     });
 
   } catch (error) {
