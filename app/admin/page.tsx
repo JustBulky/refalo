@@ -112,7 +112,7 @@ export default async function AdminPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {recentClicks.map((click) => (
+                  {recentClicks.map((click: typeof recentClicks[0]) => (
                     <tr key={click.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
                         <Link
