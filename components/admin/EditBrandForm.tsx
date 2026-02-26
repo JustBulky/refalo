@@ -156,7 +156,7 @@ export default function EditBrandForm({
           </div>
         )}
         
-          href={`/admin/codes/add?brand=${brand.slug}`}
+          <a href={`/admin/codes/add?brand=${brand.slug}`}
           className="inline-block mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-medium"
         >
           + Add Referral Link
