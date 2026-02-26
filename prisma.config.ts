@@ -6,7 +6,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    // We are forcing the absolute path here
-    url: "file:/root/refalo-v2/prisma/dev.db",
+    url: process.env.DATABASE_URL!,
   },
 });
