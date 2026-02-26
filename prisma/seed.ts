@@ -1,11 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaLibSql } from '@prisma/adapter-libsql';
 
-const adapter = new PrismaLibSql({
-  url: 'file:/home/user/app/prisma/dev.db',
-});
-
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();;
 
 const LAUNCH_50_BRANDS = [
   { name: 'Shopify', slug: 'shopify', description: 'E-commerce platform for online stores', category: 'E-commerce', logoUrl: 'https://logo.clearbit.com/shopify.com' },
