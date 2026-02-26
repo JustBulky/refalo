@@ -28,7 +28,7 @@ export default async function AddCodePage({
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         <div className="mb-6">
           
-            href="/admin"
+          <a href="/admin"
             className="text-blue-600 hover:text-blue-800 font-medium"
           >
             ← Back to Admin
