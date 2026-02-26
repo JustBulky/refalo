@@ -15,10 +15,10 @@
   "dependencies": {
     "@prisma/client": "^6.0.0",
     "dotenv": "^17.2.3",
-    "next": "15.2.3",
+    "next": "15.2.6",
     "prisma": "^6.0.0",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
     "tsx": "^4.21.0"
   },
   "devDependencies": {
@@ -28,7 +28,7 @@
     "@types/react-dom": "^19",
     "baseline-browser-mapping": "^2.9.19",
     "eslint": "^9",
-    "eslint-config-next": "15.2.3",
+    "eslint-config-next": "15.2.6",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
