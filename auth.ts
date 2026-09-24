@@ -65,25 +65,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (account?.provider === "google" && user.email) {
         const existing = await prisma.user.findUnique({ where: { email: user.email } });
         if (existing) {
-          // Link Google account to existing email/password account
-          const linked = await prisma.account.findFirst({
-            where: { userId: existing.id, provider: "google" },
-          });
-          if (!linked) {
-            await prisma.account.create({
-              data: {
-                userId: existing.id,
-                type: account.type,
-                provider: account.provider,
-                providerAccountId: account.providerAccountId,
-                access_token: account.access_token,
-                token_type: account.token_type,
-                scope: account.scope,
-                id_token: account.id_token,
-              },
-            });
-          }
-          // Return the existing user's id so the session reflects the right account
+          // Google has verified email ownership — allow sign-in as existing account.
+          // Do NOT auto-link: auto-linking lets a pre-registered credentials account
+          // persist access after a Google user takes over their own email.
           user.id = existing.id;
         }
       }
