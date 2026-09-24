@@ -11,6 +11,7 @@ type CodeCardProps = {
   workedCount: number;
   failedCount: number;
   submittedBy?: string | null;
+  lastVerified?: Date | string | null;
   brandSlug: string;
 };
 
@@ -27,6 +28,7 @@ export default function CodeCard({
   workedCount,
   failedCount,
   submittedBy,
+  lastVerified,
   brandSlug,
 }: CodeCardProps) {
   const [copied, setCopied] = useState(false);
@@ -139,6 +141,11 @@ export default function CodeCard({
             <p className="mt-2 text-xs text-zinc-500">
               <span className="text-emerald-400 font-medium">{successRate}% worked</span>
               {" "}({total} {total === 1 ? "vote" : "votes"})
+            </p>
+          )}
+          {lastVerified && (
+            <p className="mt-1 text-xs text-zinc-600">
+              ✓ Verified {Math.floor((Date.now() - new Date(lastVerified).getTime()) / 86400000)}d ago
             </p>
           )}
         </div>

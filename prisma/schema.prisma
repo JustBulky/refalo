@@ -57,21 +57,23 @@ model Brand {
 }
 
 model Code {
-  id          String   @id @default(cuid())
-  brandId     String
-  userId      String?
-  code        String
-  url         String?
-  description String?
-  isFounder   Boolean  @default(false)
-  isPinned    Boolean  @default(false)
-  workedCount Int      @default(0)
-  failedCount Int      @default(0)
-  createdAt   DateTime @default(now())
-  brand       Brand    @relation(fields: [brandId], references: [id])
-  user        User?    @relation(fields: [userId], references: [id])
-  votes       Vote[]
-  clicks      Click[]
+  id           String    @id @default(cuid())
+  brandId      String
+  userId       String?
+  code         String
+  url          String?
+  description  String?
+  isFounder    Boolean   @default(false)
+  isPinned     Boolean   @default(false)
+  isApproved   Boolean   @default(false)
+  lastVerified DateTime?
+  workedCount  Int       @default(0)
+  failedCount  Int       @default(0)
+  createdAt    DateTime  @default(now())
+  brand        Brand     @relation(fields: [brandId], references: [id])
+  user         User?     @relation(fields: [userId], references: [id])
+  votes        Vote[]
+  clicks       Click[]
 }
 
 model Vote {

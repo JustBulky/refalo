@@ -17,7 +17,7 @@ export default async function AdminCodesPage() {
       brand: { select: { name: true, slug: true } },
       user: { select: { username: true } },
     },
-    orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }],
+    orderBy: [{ isApproved: "asc" }, { createdAt: "desc" }],
   });
 
   return (

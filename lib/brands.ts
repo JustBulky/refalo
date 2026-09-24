@@ -171,6 +171,252 @@ export const BRANDS: Brand[] = [
     ],
     tcUrl: "https://gusto.com/referrals",
   },
+  // Finance
+  {
+    slug: "webull",
+    name: "Webull",
+    domain: "webull.com",
+    description:
+      "Commission-free stock, ETF, and options trading with advanced charting tools.",
+    category: "Finance",
+    affiliateEnvKey: "AFFILIATE_WEBULL",
+    reward: "Up to 12 free stocks",
+    benefits: [
+      "Up to 12 free stocks when you open and deposit",
+      "Commission-free trading on stocks, ETFs, and options",
+      "Advanced real-time data and charting tools",
+    ],
+    tcUrl: "https://www.webull.com/activity",
+  },
+  {
+    slug: "coinbase",
+    name: "Coinbase",
+    domain: "coinbase.com",
+    description:
+      "Leading US cryptocurrency exchange for buying, selling, and staking digital assets.",
+    category: "Finance",
+    affiliateEnvKey: "AFFILIATE_COINBASE",
+    reward: "$10 in Bitcoin on first purchase",
+    benefits: [
+      "$10 in Bitcoin when you buy or sell $100 or more",
+      "Referrer also earns $10 in Bitcoin per qualifying referral",
+      "Supports 200+ cryptocurrencies with instant transfers",
+    ],
+    tcUrl: "https://www.coinbase.com/legal/referral",
+  },
+  {
+    slug: "chime",
+    name: "Chime",
+    domain: "chime.com",
+    description:
+      "Fee-free online bank account with early direct deposit and automatic savings features.",
+    category: "Finance",
+    affiliateEnvKey: "AFFILIATE_CHIME",
+    reward: "$100 bonus on first qualifying deposit",
+    benefits: [
+      "$100 bonus when you receive a qualifying direct deposit",
+      "No monthly fees, no minimum balance, no overdraft fees",
+      "Get paid up to 2 days early with direct deposit",
+    ],
+    tcUrl: "https://www.chime.com/referral-program-terms/",
+  },
+  {
+    slug: "cashapp",
+    name: "Cash App",
+    domain: "cash.app",
+    description:
+      "Send money, invest in stocks or Bitcoin, and spend with the Cash Card.",
+    category: "Finance",
+    affiliateEnvKey: "AFFILIATE_CASHAPP",
+    reward: "$5–$15 bonus for new users",
+    benefits: [
+      "New users earn $5–$15 bonus after sending their first payment",
+      "Referrer earns a matching bonus per qualifying sign-up",
+      "Invest in stocks or Bitcoin with as little as $1",
+    ],
+    tcUrl: "https://cash.app/legal/referral",
+  },
+  // Software & Tools
+  {
+    slug: "notion",
+    name: "Notion",
+    domain: "notion.so",
+    description:
+      "All-in-one workspace for notes, docs, wikis, and project management.",
+    category: "Software & Tools",
+    affiliateEnvKey: "AFFILIATE_NOTION",
+    reward: "$10 credit for you + referrer",
+    benefits: [
+      "$10 Notion credit for both you and the person who referred you",
+      "Works on Plus, Business, and AI plans",
+      "Generous free tier — unlimited pages and blocks",
+    ],
+    tcUrl: "https://www.notion.so/referral",
+  },
+  {
+    slug: "dropbox",
+    name: "Dropbox",
+    domain: "dropbox.com",
+    description:
+      "Cloud storage and file sync platform for individuals and teams.",
+    category: "Software & Tools",
+    affiliateEnvKey: "AFFILIATE_DROPBOX",
+    reward: "500 MB–32 GB free storage",
+    benefits: [
+      "Earn 500 MB of extra storage per referral (up to 32 GB on free plan)",
+      "Plus plan referrals earn 1 GB each (up to 32 GB)",
+      "Files sync automatically across all your devices",
+    ],
+    tcUrl: "https://www.dropbox.com/referrals",
+  },
+  {
+    slug: "grammarly",
+    name: "Grammarly",
+    domain: "grammarly.com",
+    description:
+      "AI writing assistant that checks grammar, clarity, tone, and plagiarism.",
+    category: "Software & Tools",
+    affiliateEnvKey: "AFFILIATE_GRAMMARLY",
+    reward: "Premium subscription discounts",
+    benefits: [
+      "Referrer earns cash or credits when friends upgrade to Premium",
+      "Real-time grammar, spelling, and style suggestions",
+      "Works across browsers, Google Docs, and desktop apps",
+    ],
+    tcUrl: "https://www.grammarly.com/referral-program",
+  },
+  // Hosting & Domains
+  {
+    slug: "namecheap",
+    name: "Namecheap",
+    domain: "namecheap.com",
+    description:
+      "Affordable domain registration and web hosting with free WhoisGuard privacy.",
+    category: "Hosting & Domains",
+    affiliateEnvKey: "AFFILIATE_NAMECHEAP",
+    reward: "Discounts on first domain or hosting",
+    benefits: [
+      "Discounts on your first domain registration",
+      "Free WhoisGuard privacy protection on eligible domains",
+      "Hosting plans starting under $2/month",
+    ],
+    tcUrl: "https://www.namecheap.com/referral-program/",
+  },
+  {
+    slug: "cloudflare",
+    name: "Cloudflare",
+    domain: "cloudflare.com",
+    description:
+      "CDN, DNS, DDoS protection, and developer platform for fast and secure websites.",
+    category: "Hosting & Domains",
+    affiliateEnvKey: "AFFILIATE_CLOUDFLARE",
+    reward: "Credits toward Workers and Pages",
+    benefits: [
+      "Free plan covers most personal and small business use cases",
+      "Referral credits apply to Workers, Pages, and R2 usage",
+      "Domain registration at cost — no markup over ICANN fees",
+    ],
+    tcUrl: "https://www.cloudflare.com/referral-program/",
+  },
+  // Food & Drink
+  {
+    slug: "doordash",
+    name: "DoorDash",
+    domain: "doordash.com",
+    description:
+      "Food delivery from local restaurants and national chains, delivered fast.",
+    category: "Food & Drink",
+    affiliateEnvKey: "AFFILIATE_DOORDASH",
+    reward: "$10–$20 off your first order",
+    benefits: [
+      "$10–$20 off your first DoorDash order with a referral code",
+      "Referrer earns account credit per qualifying new customer",
+      "DashPass subscription unlocks free delivery on eligible orders",
+    ],
+    tcUrl: "https://help.doordash.com/consumers/s/article/referral-program",
+  },
+  {
+    slug: "instacart",
+    name: "Instacart",
+    domain: "instacart.com",
+    description:
+      "Grocery delivery and pickup from hundreds of stores in your area.",
+    category: "Food & Drink",
+    affiliateEnvKey: "AFFILIATE_INSTACART",
+    reward: "Free delivery on first 3 orders",
+    benefits: [
+      "Free delivery on your first 3 orders with a referral code",
+      "Referrer earns credit when the new customer places their first order",
+      "Order from multiple stores in one delivery",
+    ],
+    tcUrl: "https://www.instacart.com/terms",
+  },
+  // Electronics
+  {
+    slug: "newegg",
+    name: "Newegg",
+    domain: "newegg.com",
+    description:
+      "Tech retailer for PC components, electronics, gaming gear, and peripherals.",
+    category: "Electronics",
+    affiliateEnvKey: "AFFILIATE_NEWEGG",
+    reward: "$10–$25 off first order",
+    benefits: [
+      "$10–$25 off your first qualifying order",
+      "Referrer earns Newegg credit per successful referral",
+      "Flash deals and combo discounts on PC components",
+    ],
+    tcUrl: "https://www.newegg.com/promotions/nepro/refer-a-friend/",
+  },
+  {
+    slug: "backmarket",
+    name: "Back Market",
+    domain: "backmarket.com",
+    description:
+      "Refurbished smartphones, laptops, and electronics at up to 70% off retail.",
+    category: "Electronics",
+    affiliateEnvKey: "AFFILIATE_BACKMARKET",
+    reward: "$20 off your first order",
+    benefits: [
+      "$20 off your first Back Market order",
+      "Referrer earns $20 store credit when the order ships",
+      "All devices pass a 25-point quality check and come with a warranty",
+    ],
+    tcUrl: "https://www.backmarket.com/en-us/refer-a-friend",
+  },
+  // Business
+  {
+    slug: "freshbooks",
+    name: "FreshBooks",
+    domain: "freshbooks.com",
+    description:
+      "Cloud accounting and invoicing software designed for small business owners.",
+    category: "Business",
+    affiliateEnvKey: "AFFILIATE_FRESHBOOKS",
+    reward: "$10 credit + 10% off for referrer",
+    benefits: [
+      "Referee gets $10 account credit on their first paid month",
+      "Referrer earns 10% commission on the first payment",
+      "Invoicing, expense tracking, time tracking, and tax reports in one place",
+    ],
+    tcUrl: "https://www.freshbooks.com/referral-program",
+  },
+  {
+    slug: "shopify",
+    name: "Shopify",
+    domain: "shopify.com",
+    description:
+      "E-commerce platform to build and grow your online store with built-in payments.",
+    category: "Business",
+    affiliateEnvKey: "AFFILIATE_SHOPIFY",
+    reward: "3-day free trial + first month for $1",
+    benefits: [
+      "3-day free trial, then pay only $1/month for your first 3 months",
+      "Partner referrals earn recurring commission on referred merchant revenue",
+      "Built-in payments, analytics, and 8,000+ app integrations",
+    ],
+    tcUrl: "https://www.shopify.com/affiliates",
+  },
 ];
 
 export function getBrandBySlug(slug: string): Brand | undefined {

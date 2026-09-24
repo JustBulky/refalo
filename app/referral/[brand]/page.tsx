@@ -52,9 +52,9 @@ export default async function BrandPage({ params }: Props) {
     });
   }
 
-  // Fetch all codes for this brand
+  // Fetch approved + founder codes for this brand
   const codes = await prisma.code.findMany({
-    where: { brandId: brand.id },
+    where: { brandId: brand.id, OR: [{ isApproved: true }, { isFounder: true }] },
     include: { user: { select: { username: true } } },
     orderBy: [
       { isFounder: "desc" },
@@ -77,6 +77,7 @@ export default async function BrandPage({ params }: Props) {
           workedCount: 0,
           failedCount: 0,
           submittedBy: null,
+          lastVerified: null,
         }
       : null;
 
@@ -91,6 +92,7 @@ export default async function BrandPage({ params }: Props) {
       workedCount: c.workedCount,
       failedCount: c.failedCount,
       submittedBy: c.user?.username ?? null,
+      lastVerified: c.lastVerified ?? null,
     })),
   ];
 
@@ -178,6 +180,7 @@ export default async function BrandPage({ params }: Props) {
               workedCount={c.workedCount}
               failedCount={c.failedCount}
               submittedBy={c.submittedBy}
+              lastVerified={c.lastVerified}
               brandSlug={slug}
             />
           ))
