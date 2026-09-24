@@ -40,14 +40,19 @@ export async function POST(req: NextRequest) {
   }
 
   const hashed = await bcrypt.hash(password, 12);
+
+  // Bootstrap: first-ever user with matching ADMIN_EMAIL gets admin only if no admin exists yet.
+  // ponytail: single bootstrap guard — add invite-token flow if multi-admin is ever needed
   const adminEmail = process.env.ADMIN_EMAIL;
+  const adminExists = adminEmail ? await prisma.user.findFirst({ where: { isAdmin: true } }) : true;
+  const isAdmin = !adminExists && !!adminEmail && email === adminEmail;
 
   const user = await prisma.user.create({
     data: {
       email,
       password: hashed,
       username,
-      isAdmin: email === adminEmail,
+      isAdmin,
     },
   });
 
