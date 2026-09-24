@@ -150,7 +150,10 @@ export default async function BrandPage({ params }: Props) {
             </li>
           ))}
         </ul>
-        <div className="mt-4 pt-3 border-t border-zinc-800">
+        <div className="mt-4 pt-3 border-t border-zinc-800 space-y-2">
+          <p className="text-xs text-amber-500/80">
+            ⚠ Reward amounts may vary and change without notice. Always verify the current offer before signing up.
+          </p>
           <a
             href={brandMeta.tcUrl}
             target="_blank"

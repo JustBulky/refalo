@@ -114,8 +114,8 @@ export default function HomePage() {
                 <div className="text-white font-semibold text-sm mb-0.5 group-hover:text-indigo-300 transition-colors">
                   {brand.name}
                 </div>
-                <div className="text-xs text-emerald-500 group-hover:text-emerald-400 transition-colors leading-snug">
-                  {brand.reward}
+                <div className="text-xs text-zinc-500 group-hover:text-zinc-400 transition-colors leading-snug">
+                  ~{brand.reward}
                 </div>
               </div>
             </Link>
